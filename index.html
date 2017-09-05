@@ -1,0 +1,44 @@
+<input type="file" id="take-picture" accept="image/*">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script> 
+var takePicture = document.querySelector("#take-picture");
+takePicture.onchange = function (event) {
+  // Get a reference to the taken picture or chosen file
+  files = event.target.files;
+  if (files && files.length > 0) {
+     file = files[0];
+     $.ajax({
+        // Your server script to process the upload
+        url: 'post',
+        type: 'POST',
+
+        // Form data
+        data: file,
+
+        // Tell jQuery not to process data or worry about content-type
+        // You *must* include these options!
+        cache: false,
+        contentType: false,
+        processData: false,
+
+        // Custom XMLHttpRequest
+        xhr: function() {
+            var myXhr = $.ajaxSettings.xhr();
+            if (myXhr.upload) {
+                // For handling the progress of the upload
+                myXhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        $('progress').attr({
+                            value: e.loaded,
+                            max: e.total,
+                        });
+                    }
+                } , false);
+            }
+            return myXhr;
+        },
+    }); 
+  }
+};</script>
+
